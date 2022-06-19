@@ -1,0 +1,203 @@
+library(bbmle)
+library(fitdistrplus)
+library(readxl)
+DATA_NEW <- read_excel("C:/Users/Roldan L. Gabayeron/Desktop/SP/DATA NEW.xlsx")
+View(DATA_NEW)
+
+x0 <- DATA_NEW$`Test low`
+x1 <- DATA_NEW$`Test normal`
+x2 <- DATA_NEW$`Test extreme`
+
+normalloglikfun <- function(m,s){
+  z <- (x1-m)/s
+  return(-sum((1/(sqrt(2*pi)*s)*exp(-0.5*z^2))))
+}
+
+gammaloglik <- function(a,b){
+    return(-sum((-x0^(a-1)*exp(-b*x0)*b^a)/gamma(a)))
+}
+
+lognormalloglik <- function(p,q){
+  z <- (log(x0-p))/q^2
+  return(-sum((1/(sqrt(2*pi)*x0*q)*exp(-0.5*z^2))))
+}
+
+
+paretologlik <- function(m,n){
+  return(-sum((m*n^m)/(x0+n)^(m+1)))
+}
+
+
+weibullrloglik <- function(a,y){
+  z <- (x2/y)^a
+  return(-sum((a/y)*(x2/y)^(a-1)*exp(-z)))
+}
+
+
+#define the negative density function of weibull
+
+weibullloglik <- function(a,y){
+  z <- (x2/y)^a
+  return(-sum((a/y)*(x2/y)^(a-1)*exp(-z)))
+}
+
+cauchyloglik <- function(r,b){
+  return(-sum((1/pi*r)*(r^2/((x0-b)^2+r^2))))
+}
+
+
+evtloglik <- function(c,d){
+  return(-sum((1/c)*exp((x0-d)/c)*exp(-exp((x0-d)/c))))
+}
+
+
+betaloglik <- function(a,b){
+  return(-sum((x0^(a-1)*(1-x0)^(b-1))/beta(a,b)))
+}
+
+
+
+#performing maximum likelihood estimation
+
+#normal
+normalMLE <- mle2(normalloglikfun,
+                  start = list(m=5,s=4), 
+                  data = data.frame(x1))
+
+summary(normalMLE)
+
+#gamma
+gammaMLE <- mle2(gammaloglik,
+                 start = list(a=1.2, b=1.1),
+                 data = data.frame(x2))
+
+summary(gammaMLE)
+
+#lognormal
+lnormalMLE <- mle2(lognormalloglik,
+                 start = list(p=0.5, q=0.2),
+                 data = data.frame(x0))
+
+summary(lnormalMLE)
+
+`#pareto
+paretoMLE <- mle2(paretologlik,
+                   start = list(m=1, n=1),
+                   data = data.frame(x0))
+
+summary(paretoMLE)
+
+#weibullr
+weibullrMLE <- mle2(weibullrloglik,
+                   start = list(a=1.1, y=1.2),
+                   data = data.frame(x2))
+
+summary(weibullrMLE)
+
+#weibull
+weibullMLE <- mle2(weibullloglik,
+                  start = list(a=1, y=2),
+                  data = data.frame(x2))
+
+summary(weibullMLE)
+
+#cauchy
+cauchyMLE <- mle2(cauchyloglik,
+                     start = list(r=6, b=1),
+                   data = data.frame(x0))
+
+summary(cauchyMLE)
+
+#extreme value type I
+evtMLE <- mle2(evtloglik,
+          start = list( c=6, d=1),
+          data = data.frame(x0))
+
+summary(evtMLE)
+
+#beta
+betaMLE <- mle2(betaloglik,
+               start = list( a=0, b=0),
+               data = data.frame(x0))
+
+summary(betaMLE)
+
+hist(xw)
+hist(x0)
+hist(x1)
+hist(x2)
+plot(density(xw))
+plot(density(x0))
+plot(density(x1))
+plot(density(x2))
+
+#For Norwegian Fire Claims
+library(bbmle)
+library(fitdistrplus)
+library(readxl)
+Fire_Insurance_Log <- read_excel("C:/Users/Roldan L. Gabayeron/Desktop/SP/Fire Insurance Log.xlsx")
+View(Fire_Insurance_Log)
+
+x0 <- Fire_Insurance_Log$`low`
+x1 <- Fire_Insurance_Log$`normal`
+x2 <- Fire_Insurance_Log$`high`
+
+#define the negative density function of normal
+
+normalloglikfun <- function(m,s){
+  z <- (x1-m)/s
+  return(-sum((1/(sqrt(2*pi)*s)*exp(-0.5*z^2))))
+}
+
+#define the negative density function of cauchy
+
+gammaloglik <- function(a,b){
+  return(-sum((-x2^(a-1)*exp(-b*x2)*b^a)/gamma(a)))
+}
+
+
+#define the negative density function of weibull
+weibullloglik <- function(a,y){
+  z <- (x0/y)^a
+  return(-sum((a/y)*(x0/y)^(a-1)*exp(-z)))
+}
+
+
+
+#performing maximum likelihood estimation
+
+#normal
+normalMLE <- mle2(normalloglikfun,
+                  start = list(m=3,s=5.2), 
+                  data = data.frame(x1))
+
+summary(normalMLE)
+
+
+#gamma
+gammaMLE <- mle2(gammaloglik,
+                 start = list(a=1.2, b=1.1),
+                 data = data.frame(x2))
+
+summary(gammaMLE)
+
+#weibull
+weibullMLE <- mle2(weibullloglik,
+                   start = list(a=1, y=2),
+                   data = data.frame(x0))
+
+summary(weibullMLE)
+
+
+hist(xw)
+hist(x0)
+hist(x1)
+hist(x2)
+plot(density(xw))
+plot(density(x0))
+plot(density(x1))
+plot(density(x2))
+
+`fit <- fitdist(x1, "norm")
+summary(fit)
+plot(fit)`
